@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Drawings on Folium Map</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+</head>
+<body>
+
+<div id="map" style="width: 800px; height: 600px;"></div>
+
+<button id="saveDrawingBtn">Guardar marcas</button>
+<button id="deleteDrawingsBtn">Borrar marcas</button>
+
+
+
+<div id="coordinates"></div>
+<button id="getLocationBtn">Obtener Ubicación</button>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Obtener el botón y el contenedor de coordenadas
+  const getLocationBtn = document.getElementById('getLocationBtn');
+  const coordinatesContainer = document.getElementById('coordinates');
+
+  // Agregar un evento de clic al botón
+  getLocationBtn.addEventListener('click', function () {
+    // Verificar si el navegador admite la geolocalización
+    if (navigator.geolocation) {
+      // Solicitar la ubicación al usuario
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          // Obtener las coordenadas
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          // Mostrar las coordenadas en el contenedor
+          coordinatesContainer.textContent = `Latitud: ${latitude}, Longitud: ${longitude}`;
+        },
+        function (error) {
+          // Manejar errores, por ejemplo, si el usuario niega el acceso a la ubicación
+          coordinatesContainer.textContent = 'No se pudo obtener la ubicación.';
+          console.error('Error al obtener la ubicación:', error);
+        }
+      );
+    } else {
+      // El navegador no admite la geolocalización
+      coordinatesContainer.textContent = 'La geolocalización no es compatible con este navegador.';
+    }
+  });
+});
+
+  var initialCoordinates = [-25.28966867163936, -57.62166930410606]; // Set initial coordinates
+
+  var map = L.map('map').setView(initialCoordinates, 16); // Set initial center and zoom level
+
+  // Initialize tile layer
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 16
+  }).addTo(map);
+
+  // Initialize drawing
+  var drawnItems = new L.FeatureGroup();
+  map.addLayer(drawnItems);
+
+  var drawControl = new L.Control.Draw({
+    edit: {
+      featureGroup: drawnItems
+    },
+    draw: {
+      polygon: true,
+      polyline: true,
+      rectangle: false,
+      circle: false,
+      marker: true
+    }
+  });
+  map.addControl(drawControl);
+
+  map.on(L.Draw.Event.CREATED, function (e) {
+    var layer = e.layer;
+    drawnItems.addLayer(layer);
+  });
+
+  // Function to load drawings from the server and display them on the map
+  function loadDrawings() {
+    fetch('/get-drawings')
+      .then(response => response.json())
+      .then(data => {
+        data.forEach(drawing => {
+          var geojsonData = JSON.parse(drawing.geojson);
+          L.geoJSON(geojsonData).addTo(map);
+        });
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to load drawings.');
+      });
+  }
+
+  // Call the function to load drawings when the page loads
+  window.addEventListener('load', function() {
+    loadDrawings();
+  });
+
+  document.getElementById('saveDrawingBtn').addEventListener('click', function() {
+    var drawingsData = [];
+    drawnItems.eachLayer(function (layer) {
+      drawingsData.push(layer.toGeoJSON());
+    });
+
+    fetch('/save-drawing', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 'geojson': drawingsData })
+    })
+    .then(response => response.json())
+    .then(data => {
+      alert(data.message); // Show success message
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Failed to save drawing. Please try again.');
+    });
+  });
+
+  document.getElementById('deleteDrawingsBtn').addEventListener('click', function() {
+    fetch('/delete-drawings', {
+      method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+      alert(data.message); // Show success message
+      // Clear drawn items from the map after deletion
+      drawnItems.clearLayers();
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Failed to delete drawings. Please try again.');
+    });
+  });
+
+</script>
+
+</body>
+</html>

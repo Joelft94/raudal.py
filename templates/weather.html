@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Document</title>
+</head>
+<body>
+
+    <main class="flex">
+        <!-- MAPA -->
+        <div class="w-[70%]">
+            <div id="map" style="width: 800px; height: 600px;"></div>
+
+            <button id="saveDrawingBtn">Guardar marcas</button>
+            <button id="deleteDrawingsBtn">Borrar marcas</button>
+            
+            <div id="coordinates"></div>
+            <button id="getLocationBtn">Obtener Ubicación</button>
+        </div>
+        <!-- MAPA -->
+            
+        <!-- caja padre -->
+        
+        <div class="w-[30%]">  
+            
+            <div class="w-full flex bg-auto" style="background-image: url(../static/fondo_clima.jpeg)">
+                
+                <div class="py-6 pl-8 pr-32 w-full flex flex-col justify-evenly text-white h-[50vh] bg-gradient-to-b from-[#484667] via-[#043271] to-[#00b7f2] opacity-90"> 
+                    
+                    <!-- DIA DE HOY -->
+                    <div class="">
+                        <h2 class="font-bold text-3xl leading-none pb-1">{{day_list[0]}}</h2>
+                        <h3 class="leading-none pb-2 pl-1">{{DD[1] + DD[2]+ MM[0]+ MM [1] + MM[2]+ "-" + AAAA[0]+ AAAA[1]+ AAAA[2]+ AAAA[3]}}</h3>
+                        <p class="flex aling-center opacity-75"><svg class=" w-4 inline mr-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px"  viewBox="0 0 425.963 425.963" style="enable-background:new 0 0 425.963 425.963;" xml:space="preserve" class=""><g><g><path d="M213.285,0h-0.608C139.114,0,79.268,59.826,79.268,133.361c0,48.202,21.952,111.817,65.246,189.081   c32.098,57.281,64.646,101.152,64.972,101.588c0.906,1.217,2.334,1.934,3.847,1.934c0.043,0,0.087,0,0.13-0.002   c1.561-0.043,3.002-0.842,3.868-2.143c0.321-0.486,32.637-49.287,64.517-108.976c43.03-80.563,64.848-141.624,64.848-181.482   C346.693,59.825,286.846,0,213.285,0z M274.865,136.62c0,34.124-27.761,61.884-61.885,61.884   c-34.123,0-61.884-27.761-61.884-61.884s27.761-61.884,61.884-61.884C247.104,74.736,274.865,102.497,274.865,136.62z" data-original="#000000" class="active-path" data-old_color="#000000" fill="#FFFFFF"/></svg>
+                        Asuncion, PY
+                        </p>
+                    </div>
+                    
+                    <div class="flex items-center  w-[400px] justify-around">
+                    
+                            <g>
+                                {% if icono[0] == "sunny" %}
+                                    <img class="w-[150px]" src="../static/sunny.png" alt="sunny">
+                                {% elif icono[0] == "rain" %}
+                                    <img class="w-[150px]" src="../static/rain.png" alt="rain">
+                                {% elif icono[0] == "night" %}
+                                    <img class="w-[150px]" src="../static/night.png" alt="night">
+                                {% elif icono[0] == "night_cloudy" %}
+                                    <img class="w-[150px]" src="../static/night_cloudy.png" alt="night_cloudy">
+                                {% elif icono[0] == "mostly_cloudy"%}
+                                    <img class="w-[150px]" src="../static/mostly_cloudy.jpg" alt="mostly_cloudy">
+                                {% else %}
+                                    <img class="w-[150px]" src="../static/cloudy.png" alt="cloudy">
+                                {% endif %}
+    
+                            </g>
+                        <div class="flex flex-col items-center">
+                            <strong class="leading-none text-6xl block font-weight-bolder">{{current_temperature_2m}}ºC</strong>
+                            <b class="text-2xl block font-bold">{{tiempo_actual[0]}}</b>
+                        </div>
+                    </div>
+                    <!-- DIA DE HOY -->
+                </div>
+            
+            </div>
+            
+            <!-- CAJA NEGRA -->
+            <div class="w-full flex">
+                <div class="bg-gradient-to-t from-[#484667] via-[#043271] to-[#00b7f2] text-white p-8 w-full opacity-90">
+                    <div class="flex justify-between w-64 mb-4 w-full">
+                        <div class="w-auto font-bold uppercase text-90">Precipitacion</div><div class="w-auto text-right">{{current_precipitation}} %</div>
+                    </div>
+                    <div class="flex justify-between w-64 mb-4 w-full">
+                        <div class="w-auto font-bold uppercase text-90">Humedad</div><div class="w-auto text-right">{{current_relative_humidity_2m}} %</div>
+                    </div>
+                    <div class="flex justify-between w-64 mb-8 w-full">
+                        <div class="w-auto font-bold uppercase text-90">Viento</div><div class="w-auto text-right">{{current_wind_speed_10m}} Km/h</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="flex flex-col w-1/4 bg-[#00B7F2] rounded-lg pb-4">
+                            <div class="text-center pt-2 mb-2">
+                                <svg class="w-10 mx-auto"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 129 129" enable-background="new 0 0 129 129">
+                                    <g>
+                                        <!-- CAJITA CLIMA 1 -->
+                                        {% if icono[1] == "sunny" %}
+                                            <img src="../static/sunny.png" alt="sunny">
+                                        {% elif icono[1] == "rain" %}
+                                            <img src="../static/rain.png" alt="rain">
+                                        {% elif icono[1] == "night" %}
+                                            <img src="../static/night.png" alt="night">
+                                        {% elif icono[1] == "night_cloudy" %}
+                                            <img src="../static/night_cloudy.png" alt="night_cloudy">
+                                        {% elif icono[1] == "mostly_cloudy"%}
+                                            <img src="../static/mostly_cloudy.jpg" alt="mostly_cloudy">
+                                        {% else %}
+                                            <img src="../static/cloudy.png" alt="cloudy">
+                                        {% endif %}
+                                            </g>
+                                        </svg>
+                                    </div>
+                            <div class="text-center">
+                                <b class="font-normal">{{day_list[1]}}</b><br>
+                                <strong class="text-xl">{{temp_dia1}}</strong>
+                            </div>
+                        </div>
+    
+                        <div class="flex flex-col w-1/4 bg-[#2A68A4] rounded-lg">
+                            <div class="text-center pt-2 mb-2">
+                                <svg class="w-10 mx-auto" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 33.062 33.062" style="enable-background:new 0 0 33.062 33.062;" xml:space="preserve">
+                                    <!-- CAJITA CLIMA 2 -->
+                                    {% if icono[2] == "sunny" %}
+                                        <img src="../static/sunny.png" alt="sunny">
+                                    {% elif icono[2] == "rain" %}
+                                        <img src="../static/rain.png" alt="rain">
+                                    {% elif icono[2] == "night" %}
+                                        <img src="../static/night.png" alt="night">
+                                    {% elif icono[2] == "night_cloudy" %}
+                                        <img src="../static/night_cloudy.png" alt="night_cloudy">
+                                    {% elif icono[2] == "mostly_cloudy"%}
+                                        <img src="../static/mostly_cloudy.jpg" alt="mostly_cloudy">
+                                    {% else %}
+                                        <img src="../static/cloudy.png" alt="cloudy">
+                                    {% endif %}
+                                    </svg>
+                                </div>
+                                <div class="text-center">
+                                    <b class="font-normal">{{day_list[2]}}</b><br>
+                                    <strong class="text-xl">{{temp_dia2}}</strong>
+                                </div>
+                            </div>
+                        <div class="flex flex-col w-1/4 bg-[#2A68A4] rounded-lg">
+                            <div class="text-center pt-2 mb-2">
+                                <svg class="w-10 mx-auto" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 33.062 33.062" style="enable-background:new 0 0 33.062 33.062;" xml:space="preserve">
+                                    <!-- CAJITA CLIMA 3 -->
+                                    {% if icono[3] == sunny %}
+                                        <img src="../static/sunny.png" alt="sunny">
+                                    {% elif icono[3] == rain %}
+                                        <img src="../static/rain.png" alt="rain">
+                                    {% elif icono[3] == night %}:
+                                        <img src="../static/night.png" alt="night">
+                                    {% elif icono[3] == night_cloudy %}:
+                                        <img src="../static/night_cloudy.png" alt="night_cloudy">
+                                    {% elif icono[3] == mostly_cloudy %}:
+                                        <img src="../static/mostly_cloudy.jpg" alt="mostly_cloudy">
+                                    {% else %}
+                                        <img src="../static/cloudy.png" alt="cloudy">
+                                    {% endif %}
+                                    </svg>
+                                </div>
+                                <div class="text-center">
+                                    <b class="font-normal">{{day_list[3]}}</b><br>
+                                    <strong class="text-xl">{{temp_dia3}}</strong>
+                                </div>
+                            </div>
+                            <div class="flex flex-col w-1/4 bg-[#2A68A4] rounded-lg">
+                                <div class="text-center pt-2 mb-2">
+                                <svg class="w-10 mx-auto" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 129 129" enable-background="new 0 0 129 129" >
+                                    <g>
+                                        <!-- CAJITA CLIMA 4 -->
+                                        {% if icono[4] == "sunny" %}
+                                            <img src="../static/sunny.png" alt="sunny">
+                                        {% elif icono[4] == "rain" %}
+                                            <img src="../static/rain.png" alt="rain">
+                                        {% elif icono[4] == "night" %}
+                                            <img src="../static/night.png" alt="night">
+                                        {% elif icono[4] == "night_cloudy" %}
+                                            <img src="../static/night_cloudy.png" alt="night_cloudy">
+                                        {% elif icono[4] == "mostly_cloudy"%}
+                                            <img src="../static/mostly_cloudy.jpg" alt="mostly_cloudy">
+                                        {% else %}
+                                            <img src="../static/cloudy.png" alt="cloudy">
+                                        {% endif %}
+                                            </g>
+                                        </svg>
+                            </div>
+                            <div class="text-center">
+                                <b class="font-normal">{{day_list[4]}}</b><br>
+                                <strong class="text-xl">{{temp_dia4}}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- CAJA NEGRA -->
+        </div>
+    
+        <!-- caja padre -->
+    </main>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+          // Obtener el botón y el contenedor de coordenadas
+          const getLocationBtn = document.getElementById('getLocationBtn');
+          const coordinatesContainer = document.getElementById('coordinates');
+        
+          // Agregar un evento de clic al botón
+          getLocationBtn.addEventListener('click', function () {
+            // Verificar si el navegador admite la geolocalización
+            if (navigator.geolocation) {
+              // Solicitar la ubicación al usuario
+              navigator.geolocation.getCurrentPosition(
+                function (position) {
+                  // Obtener las coordenadas
+                  const latitude = position.coords.latitude;
+                  const longitude = position.coords.longitude;
+        
+                  // Actualizar las coordenadas iniciales
+                  initialCoordinates = [latitude, longitude];
+        
+                  // Mostrar las coordenadas en el contenedor
+                  coordinatesContainer.textContent = `Latitud: ${latitude}, Longitud: ${longitude}`;
+        
+                  // Centrar el mapa en las nuevas coordenadas
+                  map.setView([latitude, longitude], 16);
+                },
+                function (error) {
+                  // Manejar errores, por ejemplo, si el usuario niega el acceso a la ubicación
+                  coordinatesContainer.textContent = 'No se pudo obtener la ubicación.';
+                  console.error('Error al obtener la ubicación:', error);
+                }
+              );
+            } else {
+              // El navegador no admite la geolocalización
+              coordinatesContainer.textContent = 'La geolocalización no es compatible con este navegador.';
+            }
+          });
+        });
+        
+        var initialCoordinates = [-25.28966867163936, -57.62166930410606]; // Coordenadas iniciales antes de la obtención de la ubicación del usuario
+        
+        var map = L.map('map').setView(initialCoordinates, 16);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19
+        }).addTo(map);
+        
+        var drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
+        
+        var drawControl = new L.Control.Draw({
+          edit: {
+            featureGroup: drawnItems
+          },
+          draw: {
+            polygon: true,
+            polyline: true,
+            rectangle: false,
+            circle: false,
+            marker: true
+          }
+        });
+        map.addControl(drawControl);
+        
+        map.on(L.Draw.Event.CREATED, function (e) {
+          var layer = e.layer;
+          drawnItems.addLayer(layer);
+        });
+        
+        function loadDrawings() {
+          fetch('/get-drawings')
+            .then(response => response.json())
+            .then(data => {
+              data.forEach(drawing => {
+                var geojsonData = JSON.parse(drawing.geojson);
+                L.geoJSON(geojsonData).addTo(map);
+              });
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('Failed to load drawings.');
+            });
+        }
+        
+        window.addEventListener('load', function() {
+          loadDrawings();
+        });
+        
+        document.getElementById('saveDrawingBtn').addEventListener('click', function() {
+          var drawingsData = [];
+          drawnItems.eachLayer(function (layer) {
+            drawingsData.push(layer.toGeoJSON());
+          });
+        
+          fetch('/save-drawing', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 'geojson': drawingsData })
+          })
+          .then(response => response.json())
+          .then(data => {
+            alert(data.message);
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to save drawing. Please try again.');
+          });
+        });
+        
+        document.getElementById('deleteDrawingsBtn').addEventListener('click', function() {
+          fetch('/delete-drawings', {
+            method: 'DELETE'
+          })
+          .then(response => response.json())
+          .then(data => {
+            alert(data.message);
+            drawnItems.clearLayers();
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to delete drawings. Please try again.');
+          });
+        });
+        
+    </script>
+
+</body>
+</html>
+
+
+
+<!-- ºC -->
